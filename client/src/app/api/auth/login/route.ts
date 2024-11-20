@@ -32,14 +32,9 @@ export async function POST(request: Request) {
         status: error.status,
       });
     } else {
-      return Response.json(
-        {
-          message: "có lỗi xảy ra",
-        },
-        {
-          status: 500,
-        }
-      );
+      return Response.json("Lỗi hệ thống", {
+        status: 500,
+      });
     }
   }
 }

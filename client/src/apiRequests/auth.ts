@@ -8,5 +8,4 @@ const authApiRequest = {
       baseUrl: "",
     }),
 };
-
 export default authApiRequest;
