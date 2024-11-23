@@ -1,5 +1,7 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
+import AppProvider from "@/components/app-provider";
+import { Toaster } from "@/components/ui/sonner";
 interface RootLayoutProps {
   children: React.ReactNode;
 }
@@ -8,7 +10,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <>
       <html lang="en" suppressHydrationWarning>
         <head />
-        <body>
+        <AppProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -16,8 +18,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
-        </body>
+        </AppProvider>
+        <body></body>
       </html>
     </>
   );

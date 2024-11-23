@@ -13,8 +13,16 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLoginMutation } from "@/queries/useAuth";
+import { handleErrorApi } from "@/lib/utils";
+import { useState } from "react";
+import { toast as toastSonner } from "sonner";
 
 export default function LoginForm() {
+  const loginMutation = useLoginMutation();
+  const [messages, setMessages] = useState("");
+  console.log(messages);
+
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -22,7 +30,20 @@ export default function LoginForm() {
       password: "",
     },
   });
-
+  const onSubmit = async (data: LoginBodyType) => {
+    if (loginMutation.isPending) return;
+    try {
+      const result = await loginMutation.mutateAsync(data);
+      console.log(result);
+      setMessages(result.payload.message as any);
+    } catch (error: any) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+      setMessages(error);
+    }
+  };
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
@@ -34,6 +55,9 @@ export default function LoginForm() {
       <CardContent>
         <Form {...form}>
           <form
+            onSubmit={form.handleSubmit(onSubmit, (err) => {
+              console.warn(err);
+            })}
             className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
             noValidate
           >
@@ -77,7 +101,11 @@ export default function LoginForm() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button
+                onClick={() => toastSonner(`${messages}`)}
+                type="submit"
+                className="w-full"
+              >
                 Đăng nhập
               </Button>
               <Button variant="outline" className="w-full" type="button">
