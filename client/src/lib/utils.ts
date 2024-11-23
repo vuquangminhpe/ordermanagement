@@ -37,3 +37,10 @@ export const handleErrorApi = ({
     });
   }
 };
+
+export const getAccessTokenFromLocalStorage = () => {
+  return localStorage.getItem("access_token");
+};
+export const getRefreshTokenFromLocalStorage = () => {
+  return localStorage.getItem("refresh_token");
+};
