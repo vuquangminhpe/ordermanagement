@@ -21,7 +21,6 @@ import { toast as toastSonner } from "sonner";
 export default function LoginForm() {
   const loginMutation = useLoginMutation();
   const [messages, setMessages] = useState("");
-  console.log(messages);
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

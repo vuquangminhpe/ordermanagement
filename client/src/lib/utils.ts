@@ -38,9 +38,10 @@ export const handleErrorApi = ({
   }
 };
 
+const isBrowser = typeof window !== "undefined";
 export const getAccessTokenFromLocalStorage = () => {
-  return localStorage.getItem("access_token");
+  return isBrowser ? localStorage.getItem("access_token") : null;
 };
 export const getRefreshTokenFromLocalStorage = () => {
-  return localStorage.getItem("refresh_token");
+  return isBrowser ? localStorage.getItem("refresh_token") : null;
 };
