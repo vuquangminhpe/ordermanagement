@@ -11,14 +11,14 @@ export async function POST(request: Request) {
     const { accessToken, refreshToken } = payload.data;
     const decodedAccessToken = jwt.decode(accessToken) as { exp: number };
     const decodedRefreshToken = jwt.decode(refreshToken) as { exp: number };
-    (await cookieStore).set("access_token", accessToken, {
+    (await cookieStore).set("accessToken", accessToken, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
       secure: true,
       expires: decodedAccessToken.exp * 1000,
     });
-    (await cookieStore).set("refresh_token", refreshToken, {
+    (await cookieStore).set("refreshToken", refreshToken, {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
