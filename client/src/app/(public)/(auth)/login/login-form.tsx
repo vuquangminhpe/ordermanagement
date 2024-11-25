@@ -17,8 +17,10 @@ import { useLoginMutation } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
 import { useState } from "react";
 import { toast as toastSonner } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+  const router = useRouter();
   const loginMutation = useLoginMutation();
   const [messages, setMessages] = useState("");
 
@@ -33,8 +35,9 @@ export default function LoginForm() {
     if (loginMutation.isPending) return;
     try {
       const result = await loginMutation.mutateAsync(data);
-      console.log(result);
+
       setMessages(result.payload.message as any);
+      router.push("/");
     } catch (error: any) {
       handleErrorApi({
         error,
