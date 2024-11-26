@@ -1,7 +1,8 @@
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import AppProvider from "@/components/app-provider";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+
 interface RootLayoutProps {
   children: React.ReactNode;
 }
@@ -20,9 +21,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
               disableTransitionOnChange
             >
               {children}
+              <Toaster />
             </ThemeProvider>
           </AppProvider>
-          <Toaster />
         </body>
       </html>
     </>
