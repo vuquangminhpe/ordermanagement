@@ -37,7 +37,7 @@ export default function LoginForm() {
       const result = await loginMutation.mutateAsync(data);
 
       setMessages(result.payload.message as any);
-      router.push("/");
+      router.push("/manage/dashboard");
     } catch (error: any) {
       handleErrorApi({
         error,

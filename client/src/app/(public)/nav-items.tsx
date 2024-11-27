@@ -1,8 +1,5 @@
-"use client";
-import { getAccessTokenFromLocalStorage } from "@/lib/utils";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
+import { cookies } from "next/headers";
 const menuItems = [
   {
     title: "Món ăn",
@@ -26,15 +23,14 @@ const menuItems = [
 ];
 
 export default function NavItems({ className }: { className?: string }) {
-  const [isAuth, setIsAuth] = useState(false);
-  useEffect(() => {
-    setIsAuth(Boolean(getAccessTokenFromLocalStorage()));
-  }, [getAccessTokenFromLocalStorage()]);
+  const cookieStore = cookies();
 
-  return menuItems.map((item) => {
+  return menuItems.map(async (item) => {
     if (
-      (item.authRequired === false && isAuth) ||
-      (item.authRequired === true && !isAuth)
+      (item.authRequired === false &&
+        Boolean((await cookieStore).get("accessToken"))) ||
+      (item.authRequired === true &&
+        !Boolean((await cookieStore).get("accessToken")))
     )
       return null;
     return (
