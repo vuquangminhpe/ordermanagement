@@ -3,7 +3,8 @@ import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { EntityError } from "./http";
 import { toast } from "@/components/ui/use-toast";
-
+import authApiRequest from "@/apiRequests/auth";
+import jwt from "jsonwebtoken";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -37,7 +38,47 @@ export const handleErrorApi = ({
     });
   }
 };
-
+export const checkAndRefreshToken = async (param?: {
+  onError?: () => void;
+  onSuccess?: () => void;
+}) => {
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+  if (!accessToken || !refreshToken) {
+    return;
+  }
+  const decodedAccessToken: any = jwt.decode(accessToken) as {
+    exp: number;
+    iat: number;
+  };
+  const decodedRefreshToken: any = jwt.decode(refreshToken) as {
+    exp: number;
+    iat: number;
+  };
+  const now = Math.round(new Date().getTime() / 1000);
+  //trường hợp refresh token hết hạn thì thì cho logout ra khỏi hệ thống
+  if (decodedRefreshToken.exp <= now) {
+    return;
+  }
+  //ví dụ access token có time hết hạn là 10s
+  // => kiểm tra 1/3 thời gian (3s) thì cho refresh token lại
+  // time còn lại tính theo CT:decodedAccessToken.exp - now
+  // thời gian hết hạn của access token: decodedAccessToken.exp - decodedAccessToken.iat
+  if (
+    decodedAccessToken.exp - now <
+    (decodedAccessToken.exp - decodedAccessToken.iat) / 3
+  ) {
+    // Goị api refresh token
+    try {
+      const res = await authApiRequest.refreshToken();
+      setAccessTokenToLocalStorage(res.payload.data.accessToken);
+      setRefreshTokenToLocalStorage(res.payload.data.refreshToken);
+      param?.onSuccess && param.onSuccess();
+    } catch (error) {
+      param?.onError && param.onError();
+    }
+  }
+};
 const isBrowser = typeof window !== "undefined";
 export const getAccessTokenFromLocalStorage = () =>
   isBrowser ? localStorage.getItem("accessToken") : null;

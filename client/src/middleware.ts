@@ -6,8 +6,8 @@ const unAuthPaths = ["/login"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const accessToken = Boolean(req.cookies.get("accessToken")?.value);
-  const refreshToken = Boolean(req.cookies.get("refreshToken")?.value);
+  const accessToken = req.cookies.get("accessToken")?.value;
+  const refreshToken = req.cookies.get("refreshToken")?.value;
 
   // chưa đăng nhập thì ko cho vào private paths
   if (privatePaths.some((path) => pathname.startsWith(path)) && !refreshToken) {
@@ -25,11 +25,9 @@ export function middleware(req: NextRequest) {
     !accessToken &&
     refreshToken
   ) {
-    const url = new URL("/logout", req.url);
-    url.searchParams.set(
-      "refreshToken",
-      req.cookies.get("refreshToken")?.value ?? ""
-    );
+    const url = new URL("/refresh-token", req.url);
+    url.searchParams.set("refreshToken", refreshToken);
+    url.searchParams.set("redirect", pathname);
     return NextResponse.redirect(url);
   }
 
