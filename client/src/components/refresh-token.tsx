@@ -1,44 +1,45 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { checkAndRefreshToken } from "@/lib/utils";
 
-const UNAUTHENTICATED_PATHS = ["/login", "/register", "/refresh-token"];
+const UNAUTHENTICATED_PATHS = ["/login", "/logout", "/refresh-token"];
 
 export default function RefreshToken() {
   const pathname = usePathname();
-
+  const router = useRouter();
   useEffect(() => {
     if (UNAUTHENTICATED_PATHS.includes(pathname)) {
       return;
     }
 
-    let intervalId: ReturnType<typeof setInterval> | null = null;
+    let intervalId: any = null;
 
-    const runTokenRefresh = () => {
-      checkAndRefreshToken({
-        onError: () => {
-          if (intervalId) {
-            clearInterval(intervalId);
-            intervalId = null;
-          }
-        },
-      });
-    };
+    checkAndRefreshToken({
+      onError: () => {
+        clearInterval(intervalId);
 
-    runTokenRefresh();
+        router.push("/login");
+      },
+    });
 
     const TIMEOUT = 1000 * 60;
-    intervalId = setInterval(runTokenRefresh, TIMEOUT);
+    intervalId = setInterval(
+      () =>
+        checkAndRefreshToken({
+          onError: () => {
+            clearInterval(intervalId);
+            router.push("/login");
+          },
+        }),
+      TIMEOUT
+    );
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-        intervalId = null;
-      }
+      clearInterval(intervalId);
     };
-  }, [pathname]);
+  }, [pathname, router]);
 
   return null;
 }

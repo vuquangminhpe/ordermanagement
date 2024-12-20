@@ -38,6 +38,10 @@ export const handleErrorApi = ({
     });
   }
 };
+export const removeTokensFromLocalStorage = () => {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+};
 export const checkAndRefreshToken = async (param?: {
   onError?: () => void;
   onSuccess?: () => void;
@@ -56,9 +60,12 @@ export const checkAndRefreshToken = async (param?: {
     iat: number;
   };
   const now = Math.round(new Date().getTime() / 1000);
-  //trường hợp refresh token hết hạn thì thì cho logout ra khỏi hệ thống
+  //trường hợp refresh token hết hạn thì cho logout ra khỏi hệ thống
   if (decodedRefreshToken.exp <= now) {
-    return;
+    console.log("Refresh token hết hạn");
+
+    removeTokensFromLocalStorage();
+    return param?.onError && param.onError();
   }
   //ví dụ access token có time hết hạn là 10s
   // => kiểm tra 1/3 thời gian (3s) thì cho refresh token lại
