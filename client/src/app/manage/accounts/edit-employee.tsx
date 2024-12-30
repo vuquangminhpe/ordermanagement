@@ -21,18 +21,26 @@ import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { useUploadMediaMutation } from "@/queries/useMedia";
+import { useUpdateAccountMutation } from "@/queries/useAccount";
+import { toast } from "@/components/ui/use-toast";
+import { handleErrorApi } from "@/lib/utils";
 
 export default function EditEmployee({
   id,
   setId,
   onSubmitSuccess,
+  refetch,
 }: {
   id?: number | undefined;
   setId: (value: number | undefined) => void;
   onSubmitSuccess?: () => void;
+  refetch: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadMediaMutation = useUploadMediaMutation();
+  const updateEmployeeMutation = useUpdateAccountMutation();
   const form = useForm<UpdateEmployeeAccountBodyType>({
     resolver: zodResolver(UpdateEmployeeAccountBody),
     defaultValues: {
@@ -53,7 +61,43 @@ export default function EditEmployee({
     }
     return avatar;
   }, [file, avatar]);
-
+  const reset = () => {
+    form.reset({});
+    setFile(null);
+  };
+  const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
+    if (updateEmployeeMutation.isPending) return;
+    try {
+      let body = values;
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const updateImageResult = await uploadMediaMutation.mutateAsync(
+          formData
+        );
+        const imageUrl = updateImageResult.payload.data;
+        body = {
+          ...values,
+          avatar: imageUrl,
+        };
+      }
+      const result = await updateEmployeeMutation.mutateAsync({
+        id: id as number,
+        ...body,
+      });
+      onSubmitSuccess && onSubmitSuccess();
+      toast({
+        description: `${result.payload.data.name} đã được cập nhật`,
+      });
+      reset();
+      refetch();
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError,
+      });
+    }
+  };
   return (
     <Dialog
       open={Boolean(id)}
@@ -75,6 +119,7 @@ export default function EditEmployee({
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
             id="edit-employee-form"
+            onSubmit={form.handleSubmit(onSubmit)}
           >
             <div className="grid gap-4 py-4">
               <FormField
