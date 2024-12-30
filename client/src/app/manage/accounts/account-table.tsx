@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useSearchParams } from "next/navigation";
 import AutoPagination from "@/components/auto-pagination";
-import { useAccountList } from "@/queries/useAccount";
+import { useAccountList, useDeleteAccountMutation } from "@/queries/useAccount";
 
 type AccountItem = AccountListResType["data"][0];
 
@@ -146,9 +146,11 @@ export const columns: ColumnDef<AccountType>[] = [
 function AlertDialogDeleteAccount({
   employeeDelete,
   setEmployeeDelete,
+  onClick,
 }: {
   employeeDelete: AccountItem | null;
   setEmployeeDelete: (value: AccountItem | null) => void;
+  onClick?: () => void;
 }) {
   return (
     <AlertDialog
@@ -172,7 +174,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={onClick}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -194,6 +196,7 @@ export default function AccountTable() {
   const dataAccountsList = dataAccountList?.payload?.data;
   data = Array.isArray(dataAccountsList) ? dataAccountsList : [];
   const [sorting, setSorting] = useState<SortingState>([]);
+  const deleteAccountMutation = useDeleteAccountMutation();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
@@ -244,10 +247,26 @@ export default function AccountTable() {
         <EditEmployee
           id={employeeIdEdit}
           setId={setEmployeeIdEdit}
-          onSubmitSuccess={() => {}}
+          onSubmitSuccess={() => {
+            setEmployeeIdEdit(undefined);
+          }}
           refetch={refetch}
         />
         <AlertDialogDeleteAccount
+          onClick={() => {
+            if (employeeDelete) {
+              deleteAccountMutation.mutate(employeeDelete.id, {
+                onSuccess: (data) => {
+                  console.log(data);
+                  refetch();
+                },
+                onError: (error) => {
+                  console.error(error);
+                },
+              });
+              setEmployeeDelete(null);
+            }
+          }}
           employeeDelete={employeeDelete}
           setEmployeeDelete={setEmployeeDelete}
         />
