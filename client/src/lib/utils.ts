@@ -4,6 +4,8 @@ import { twMerge } from "tailwind-merge";
 import { EntityError } from "./http";
 import { toast } from "@/components/ui/use-toast";
 import authApiRequest from "@/apiRequests/auth";
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
+
 import jwt from "jsonwebtoken";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -96,3 +98,22 @@ export const setAccessTokenToLocalStorage = (accessToken: string) =>
   isBrowser && localStorage.setItem("accessToken", accessToken);
 export const setRefreshTokenToLocalStorage = (refreshToken: string) =>
   isBrowser && localStorage.setItem("refreshToken", refreshToken);
+export const formatCurrency = (number: number) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(number);
+};
+
+export const getVietnameseDishStatus = (
+  status: (typeof DishStatus)[keyof typeof DishStatus]
+) => {
+  switch (status) {
+    case DishStatus.Available:
+      return "Có sẵn";
+    case DishStatus.Unavailable:
+      return "Không có sẵn";
+    default:
+      return "Ẩn";
+  }
+};
