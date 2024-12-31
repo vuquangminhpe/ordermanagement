@@ -79,6 +79,7 @@ export default function EditTable({
             toast({ description: "Cập nhật bàn ăn thành công" });
             refetch();
             reset();
+            setId(undefined);
             onSubmitSuccess && onSubmitSuccess();
           },
           onError: () => {

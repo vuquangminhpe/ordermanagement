@@ -37,7 +37,7 @@ import {
 } from "@/schemaValidations/dish.schema";
 import { DishStatus, DishStatusValues } from "@/constants/type";
 import { Textarea } from "@/components/ui/textarea";
-import { useEditDish } from "@/queries/useDishes";
+import { useEditDish, useGetDishDetail } from "@/queries/useDishes";
 import { useUploadMediaMutation } from "@/queries/useMedia";
 
 export default function EditDish({
@@ -51,6 +51,8 @@ export default function EditDish({
 }) {
   const [file, setFile] = useState<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const { data: DetailsDataDishes, refetch } = useGetDishDetail(id as number);
+  const detailDish: any = DetailsDataDishes?.payload?.data;
   const uploadMediaMutation = useUploadMediaMutation();
   const updateDishMutation = useEditDish();
   const form = useForm<UpdateDishBodyType>({
@@ -63,6 +65,15 @@ export default function EditDish({
       status: DishStatus.Unavailable,
     },
   });
+  console.log("details", detailDish);
+
+  useEffect(() => {
+    form.setValue("name", detailDish?.name);
+    form.setValue("description", detailDish?.description);
+    form.setValue("price", detailDish?.price);
+    form.setValue("image", detailDish?.image);
+    form.setValue("status", detailDish?.status);
+  }, [detailDish]);
   const image = form.watch("image");
   const name = form.watch("name");
   const previewAvatarFromFile = useMemo(() => {
@@ -91,12 +102,13 @@ export default function EditDish({
           image: imageUrl,
         };
       }
-      const result = await updateDishMutation.mutateAsync({
+      await updateDishMutation.mutateAsync({
         id: id as number,
         ...body,
       });
-      console.log(result);
       reset();
+      refetch();
+      setId(undefined);
       onSubmitSuccess && onSubmitSuccess();
     } catch (error) {
       handleErrorApi({
@@ -118,7 +130,7 @@ export default function EditDish({
         <DialogHeader>
           <DialogTitle>Cập nhật món ăn</DialogTitle>
           <DialogDescription>
-            Các trường sau đây là bắ buộc: Tên, ảnh
+            Các trường sau đây là bắt buộc: Tên, ảnh
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
