@@ -1,4 +1,4 @@
-import accountApiRequest from "@/apiRequests/account";
+import accountApiRequest from "@/apiRequests/account.api";
 import {
   AccountResType,
   UpdateEmployeeAccountBodyType,

@@ -1,4 +1,4 @@
-import accountApiRequest from "@/apiRequests/account";
+import accountApiRequest from "@/apiRequests/account.api";
 import { cookies } from "next/headers";
 import React from "react";
 

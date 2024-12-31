@@ -3,10 +3,11 @@ import { UseFormSetError } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import { EntityError } from "./http";
 import { toast } from "@/components/ui/use-toast";
-import authApiRequest from "@/apiRequests/auth";
+import authApiRequest from "@/apiRequests/auth.api";
 import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 
 import jwt from "jsonwebtoken";
+import envConfig from "@/config";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -116,4 +117,28 @@ export const getVietnameseDishStatus = (
     default:
       return "Ẩn";
   }
+};
+
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus]
+) => {
+  switch (status) {
+    case TableStatus.Available:
+      return "Có sẵn";
+    case TableStatus.Reserved:
+      return "Đã đặt";
+    default:
+      return "Ẩn";
+  }
+};
+export const getTableLink = ({
+  token,
+  tableNumber,
+}: {
+  token: string;
+  tableNumber: number;
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+  );
 };

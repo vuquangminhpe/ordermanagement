@@ -1,4 +1,4 @@
-import dishApiRequests from "@/apiRequests/dishs";
+import dishApiRequests from "@/apiRequests/dishs.api";
 import {
   CreateDishBodyType,
   UpdateDishBodyType,
