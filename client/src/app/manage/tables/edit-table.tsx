@@ -34,6 +34,9 @@ import { TableStatus, TableStatusValues } from "@/constants/type";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { useGetTableDetail, useUpdateTable } from "@/queries/useTable";
+import { toast } from "@/components/ui/use-toast";
+import { log } from "node:console";
+import { useEffect } from "react";
 
 export default function EditTable({
   id,
@@ -44,18 +47,24 @@ export default function EditTable({
   setId: (value: number | undefined) => void;
   onSubmitSuccess?: () => void;
 }) {
-  const { data: DetailsDataTables } = useGetTableDetail(id as number);
+  const { data: DetailsDataTables, refetch } = useGetTableDetail(id as number);
   const detailDataTable: any = DetailsDataTables?.payload?.data;
+  console.log(detailDataTable);
+
   const form = useForm<UpdateTableBodyType>({
     resolver: zodResolver(UpdateTableBody),
     defaultValues: {
-      capacity: detailDataTable?.capacity,
-      status: detailDataTable?.status,
+      capacity: 0,
+      status: TableStatus.Available,
       changeToken: false,
     },
   });
+  useEffect(() => {
+    form.setValue("capacity", detailDataTable?.capacity);
+    form.setValue("status", detailDataTable?.status);
+  }, [detailDataTable]);
   const updateTableMutation = useUpdateTable();
-  const tableNumber = 0;
+  const tableNumber = detailDataTable?.number;
   const reset = () => {
     form.reset();
     setId(undefined);
@@ -67,8 +76,8 @@ export default function EditTable({
         { number: id as number, ...data },
         {
           onSuccess: (data) => {
-            console.log(data);
-
+            toast({ description: "Cập nhật bàn ăn thành công" });
+            refetch();
             reset();
             onSubmitSuccess && onSubmitSuccess();
           },
