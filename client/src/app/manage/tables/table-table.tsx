@@ -49,7 +49,7 @@ import AutoPagination from "@/components/auto-pagination";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import EditTable from "@/app/manage/tables/edit-table";
 import AddTable from "@/app/manage/tables/add-table";
-import { useGetAllTables } from "@/queries/useTable";
+import { useDeleteTable, useGetAllTables } from "@/queries/useTable";
 import { QRCodeTable } from "@/components/QRCodeTable";
 
 type TableItem = TableListResType["data"][0];
@@ -180,6 +180,7 @@ export default function TableTable() {
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null);
   const { data: allDataTables, refetch } = useGetAllTables();
   const allDataTable = allDataTables?.payload?.data ?? [];
+  const deleteTableMutation = useDeleteTable();
   let data: any[] = [];
   data = allDataTable;
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -233,6 +234,13 @@ export default function TableTable() {
         <AlertDialogDeleteTable
           onClick={() => {
             if (tableDelete) {
+              deleteTableMutation.mutate(tableDelete.number, {
+                onSuccess: () => {
+                  refetch();
+                },
+                onError: () => {},
+              });
+              setTableDelete(null);
             }
           }}
           tableDelete={tableDelete}

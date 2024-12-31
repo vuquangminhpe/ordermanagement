@@ -55,6 +55,7 @@ export default function AddTable({ refetch }: AddTableProps) {
     setOpen(false);
   };
   const onSubmit = async (data: CreateTableBodyType) => {
+    if (addTableMutation.isPending) return;
     try {
       await addTableMutation.mutateAsync(data, {
         onSuccess: (data) => {
