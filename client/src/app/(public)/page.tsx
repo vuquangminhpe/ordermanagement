@@ -1,6 +1,12 @@
+"use client";
+import { formatCurrency } from "@/lib/utils";
+import { useGetAllDishes } from "@/queries/useDishes";
 import Image from "next/image";
 
 export default function Home() {
+  const { data: dataAllDishes } = useGetAllDishes();
+  const allDishes = dataAllDishes?.payload?.data;
+
   return (
     <div className="w-full space-y-4">
       <div className="relative">
@@ -25,23 +31,21 @@ export default function Home() {
       <section className="space-y-10 py-16">
         <h2 className="text-center text-2xl font-bold">Đa dạng các món ăn</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-          {Array(4)
-            .fill(0)
-            .map((_, index) => (
-              <div className="flex gap-4 w" key={index}>
-                <div className="flex-shrink-0">
-                  <img
-                    src="https://ik.imagekit.io/freeflo/production/6b91c700-92c4-4601-8e96-37d84ac3c28c.png?tr=w-2048,q-75&alt=media&pr-true"
-                    className="object-cover w-[150px] h-[150px] rounded-md"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-xl font-semibold">Bánh mì</h3>
-                  <p className="">Bánh mì sandwidch</p>
-                  <p className="font-semibold">123,123đ</p>
-                </div>
+          {allDishes?.map((item, index) => (
+            <div className="flex gap-4 w" key={index}>
+              <div className="flex-shrink-0">
+                <img
+                  src={item.image}
+                  className="object-cover w-[150px] h-[150px] rounded-md"
+                />
               </div>
-            ))}
+              <div className="space-y-1">
+                <h3 className="text-xl font-semibold">{item.name}</h3>
+                <p className="">{item.description}</p>
+                <p className="font-semibold">{formatCurrency(item.price)}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     </div>
