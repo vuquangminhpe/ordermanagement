@@ -30,13 +30,13 @@ import {
   UpdateTableBody,
   UpdateTableBodyType,
 } from "@/schemaValidations/table.schema";
-import { TableStatus, TableStatusValues } from "@/constants/type";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { useGetTableDetail, useUpdateTable } from "@/queries/useTable";
 import { toast } from "@/components/ui/use-toast";
 import { log } from "node:console";
 import { useEffect } from "react";
+import { TableStatus, TableStatusValues } from "@/constants/type";
 
 export default function EditTable({
   id,

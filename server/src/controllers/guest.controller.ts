@@ -62,6 +62,7 @@ export const guestCreateOrdersController = async (guestId: number, body: GuestCr
         id: guestId
       }
     })
+
     const orders = await Promise.all(
       body.orders.map(async (order) => {
         const dish = await tx.dish.findUniqueOrThrow({
@@ -69,6 +70,7 @@ export const guestCreateOrdersController = async (guestId: number, body: GuestCr
             id: order.dishId
           }
         })
+
         const dishSnapshot = await tx.dishSnapshot.create({
           data: {
             description: dish.description,

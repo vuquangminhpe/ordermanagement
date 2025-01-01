@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
-import { Role } from "@/constants/type";
 import { RoleType } from "@/types/jwt.types";
 import { useAppContext } from "@/components/app-provider";
 import { cn, handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { useRouter } from "next/navigation";
+import { Role } from "@/constants/type";
 
 const menuItems: {
   title: string;

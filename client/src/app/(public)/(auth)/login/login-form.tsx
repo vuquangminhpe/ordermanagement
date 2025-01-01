@@ -46,7 +46,6 @@ export default function LoginForm() {
       const result = await loginMutation.mutateAsync(data);
 
       setMessages(result.payload.message as any);
-      console.log(result);
 
       setRole(result.payload.data.account.role);
       router.push("/manage/dashboard");
