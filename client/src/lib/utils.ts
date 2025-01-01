@@ -8,6 +8,7 @@ import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 
 import jwt from "jsonwebtoken";
 import envConfig from "@/config";
+import { TokenPayload } from "@/types/jwt.types";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -54,14 +55,8 @@ export const checkAndRefreshToken = async (param?: {
   if (!accessToken || !refreshToken) {
     return;
   }
-  const decodedAccessToken: any = jwt.decode(accessToken) as {
-    exp: number;
-    iat: number;
-  };
-  const decodedRefreshToken: any = jwt.decode(refreshToken) as {
-    exp: number;
-    iat: number;
-  };
+  const decodedAccessToken: any = decodeToken(accessToken);
+  const decodedRefreshToken: any = decodeToken(refreshToken);
   const now = Math.round(new Date().getTime() / 1000);
   //trường hợp refresh token hết hạn thì cho logout ra khỏi hệ thống
   if (decodedRefreshToken.exp <= now) {
@@ -141,4 +136,7 @@ export const getTableLink = ({
   return (
     envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
   );
+};
+export const decodeToken = (token: string) => {
+  return jwt.decode(token) as TokenPayload;
 };

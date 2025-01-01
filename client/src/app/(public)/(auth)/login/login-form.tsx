@@ -15,13 +15,16 @@ import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast as toastSonner } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAppContext } from "@/components/app-provider";
 
 export default function LoginForm() {
+  const { setRole } = useAppContext();
   const router = useRouter();
   const loginMutation = useLoginMutation();
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState("");
 
   const form = useForm<LoginBodyType>({
@@ -31,12 +34,16 @@ export default function LoginForm() {
       password: "",
     },
   });
+
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {
       const result = await loginMutation.mutateAsync(data);
 
       setMessages(result.payload.message as any);
+      console.log(result);
+
+      setRole(result.payload.data.account.role);
       router.push("/manage/dashboard");
     } catch (error: any) {
       handleErrorApi({

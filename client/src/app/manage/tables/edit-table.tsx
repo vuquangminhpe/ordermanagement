@@ -59,6 +59,8 @@ export default function EditTable({
       changeToken: false,
     },
   });
+  console.log(detailDataTable);
+
   useEffect(() => {
     form.setValue("capacity", detailDataTable?.capacity);
     form.setValue("status", detailDataTable?.status);
