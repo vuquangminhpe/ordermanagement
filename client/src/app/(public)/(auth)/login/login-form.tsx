@@ -25,6 +25,7 @@ export default function LoginForm() {
   const router = useRouter();
   const loginMutation = useLoginMutation();
   const searchParams = useSearchParams();
+  const clearTokens = searchParams.get("clearTokens");
   const [messages, setMessages] = useState("");
 
   const form = useForm<LoginBodyType>({
@@ -34,7 +35,11 @@ export default function LoginForm() {
       password: "",
     },
   });
-
+  useEffect(() => {
+    if (clearTokens) {
+      setRole(undefined);
+    }
+  }, [clearTokens, setRole]);
   const onSubmit = async (data: LoginBodyType) => {
     if (loginMutation.isPending) return;
     try {

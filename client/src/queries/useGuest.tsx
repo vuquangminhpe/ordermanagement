@@ -1,4 +1,3 @@
-import authApiRequest from "@/apiRequests/auth.api";
 import guestApiRequest from "@/apiRequests/guest";
 import { useMutation } from "@tanstack/react-query";
 

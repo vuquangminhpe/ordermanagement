@@ -156,15 +156,22 @@ const request = async <Response>(
       throw new HttpError(data);
     }
   }
+  const normalizeUrl = normalizePath(url);
+
   // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
+
   if (isClient) {
-    const normalizeUrl = normalizePath(url);
-    if (["api/auth/login", "/api/guest/auth/login"].includes(normalizeUrl)) {
+    if (
+      normalizeUrl.includes("auth/login") ||
+      normalizeUrl.includes("guest/auth/login")
+    ) {
       const { accessToken, refreshToken } = (payload as LoginResType).data;
+      console.log("tokens:", accessToken, refreshToken);
       setAccessTokenToLocalStorage(accessToken);
       setRefreshTokenToLocalStorage(refreshToken);
     } else if (
-      ["api/auth/logout", "/api/guest/auth/logout"].includes(normalizeUrl)
+      normalizeUrl.includes("auth/logout") ||
+      normalizeUrl.includes("guest/auth/logout")
     ) {
       removeTokensFromLocalStorage();
     }

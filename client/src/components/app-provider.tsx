@@ -43,12 +43,15 @@ export default function AppProvider({
       setRoleState(role);
     }
   }, []);
-  const setRole = useCallback((roles?: RoleType | undefined) => {
-    setRoleState(roles);
-    if (!roles) {
-      removeTokensFromLocalStorage();
-    }
-  }, []);
+  const setRole = useCallback(
+    (roles?: RoleType | undefined) => {
+      setRoleState(roles);
+      if (!roles) {
+        removeTokensFromLocalStorage();
+      }
+    },
+    [role]
+  );
   return (
     <AppContext.Provider value={{ role, setRole }}>
       <QueryClientProvider client={queryClient}>

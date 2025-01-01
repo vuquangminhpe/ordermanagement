@@ -9,6 +9,7 @@ import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 import jwt from "jsonwebtoken";
 import envConfig from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
+import guestApiRequest from "@/apiRequests/guest";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -75,7 +76,11 @@ export const checkAndRefreshToken = async (param?: {
   ) {
     // Goị api refresh token
     try {
-      const res = await authApiRequest.refreshToken();
+      const role = decodedRefreshToken.role;
+      const res =
+        role === Role.Guest
+          ? await guestApiRequest.refreshToken()
+          : await authApiRequest.refreshToken();
       setAccessTokenToLocalStorage(res.payload.data.accessToken);
       setRefreshTokenToLocalStorage(res.payload.data.refreshToken);
       param?.onSuccess && param.onSuccess();
