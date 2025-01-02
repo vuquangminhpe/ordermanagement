@@ -9,7 +9,7 @@ import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type";
 import jwt from "jsonwebtoken";
 import envConfig from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
-import guestApiRequest from "@/apiRequests/guest";
+import guestApiRequest from "@/apiRequests/guest.api";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

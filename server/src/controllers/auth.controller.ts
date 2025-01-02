@@ -1,12 +1,9 @@
-import envConfig from '@/config'
 import prisma from '@/database'
 import { LoginBodyType } from '@/schemaValidations/auth.schema'
 import { RoleType, TokenPayload } from '@/types/jwt.types'
 import { comparePassword } from '@/utils/crypto'
 import { AuthError, EntityError } from '@/utils/errors'
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '@/utils/jwt'
-import { addMilliseconds } from 'date-fns'
-import ms from 'ms'
 
 export const logoutController = async (refreshToken: string) => {
   await prisma.refreshToken.delete({
@@ -38,7 +35,8 @@ export const loginController = async (body: LoginBodyType) => {
     userId: account.id,
     role: account.role as RoleType
   })
-  const refreshTokenExpiresAt = addMilliseconds(new Date(), ms(envConfig.REFRESH_TOKEN_EXPIRES_IN))
+  const decodedRefreshToken = verifyRefreshToken(refreshToken)
+  const refreshTokenExpiresAt = new Date(decodedRefreshToken.exp * 1000)
 
   await prisma.refreshToken.create({
     data: {
@@ -74,15 +72,11 @@ export const refreshTokenController = async (refreshToken: string) => {
     userId: account.id,
     role: account.role as RoleType
   })
-  const newRefreshToken = signRefreshToken(
-    {
-      userId: account.id,
-      role: account.role as RoleType
-    },
-    {
-      expiresIn: decodedRefreshToken.exp
-    }
-  )
+  const newRefreshToken = signRefreshToken({
+    userId: account.id,
+    role: account.role as RoleType,
+    exp: decodedRefreshToken.exp
+  })
   await prisma.refreshToken.delete({
     where: {
       token: refreshToken
@@ -91,7 +85,7 @@ export const refreshTokenController = async (refreshToken: string) => {
   await prisma.refreshToken.create({
     data: {
       accountId: account.id,
-      token: refreshToken,
+      token: newRefreshToken,
       expiresAt: refreshTokenDoc.expiresAt
     }
   })

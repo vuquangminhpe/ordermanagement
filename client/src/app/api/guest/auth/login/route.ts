@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { HttpError } from "@/lib/http";
 import { GuestLoginBodyType } from "@/schemaValidations/guest.schema";
-import guestApiRequest from "@/apiRequests/guest";
+import guestApiRequest from "@/apiRequests/guest.api";
 export async function POST(request: Request) {
   const body = (await request.json()) as GuestLoginBodyType;
   const cookieStore = cookies();

@@ -1,5 +1,5 @@
-import guestApiRequest from "@/apiRequests/guest";
-import { useMutation } from "@tanstack/react-query";
+import guestApiRequest from "@/apiRequests/guest.api";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useGuestLoginMutation = () => {
   return useMutation({
@@ -10,5 +10,18 @@ export const useGuestLoginMutation = () => {
 export const useGuestLogoutMutation = () => {
   return useMutation({
     mutationFn: guestApiRequest.logout,
+  });
+};
+
+export const useGuestOrderMutation = () => {
+  return useMutation({
+    mutationFn: guestApiRequest.order,
+  });
+};
+
+export const useGuestOrderListQuery = () => {
+  return useQuery({
+    queryKey: ["guestOrderList"],
+    queryFn: guestApiRequest.getOrderList,
   });
 };
