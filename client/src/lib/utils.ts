@@ -131,6 +131,7 @@ export const getVietnameseTableStatus = (
       return "Ẩn";
   }
 };
+
 export const getTableLink = ({
   token,
   tableNumber,
@@ -144,4 +145,20 @@ export const getTableLink = ({
 };
 export const decodeToken = (token: string) => {
   return jwt.decode(token) as TokenPayload;
+};
+export const getVietnameseOrderStatus = (
+  status: (typeof OrderStatus)[keyof typeof OrderStatus]
+) => {
+  switch (status) {
+    case OrderStatus.Pending:
+      return "Chờ xử lý";
+    case OrderStatus.Processing:
+      return "Đang nấu ăn";
+    case OrderStatus.Delivered:
+      return "Đã giao";
+    case OrderStatus.Paid:
+      return "Đã thanh toán";
+    default:
+      return "Từ chốichối";
+  }
 };
