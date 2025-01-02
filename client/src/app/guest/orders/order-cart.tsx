@@ -2,12 +2,42 @@
 import Image from "next/image";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestOrderListQuery } from "@/queries/useGuest";
-import MenuOrder from "../menu/menu-order";
+import { useEffect, useState } from "react";
+import socket from "@/lib/socket";
 
 export default function OrdersCart() {
-  const { data: dataCarts, refetch } = useGuestOrderListQuery();
-  const dataCart = dataCarts?.payload?.data ?? [];
+  const { data: dataCarts } = useGuestOrderListQuery();
 
+  const dataCart = dataCarts?.payload?.data ?? [];
+  const [ordersStatus, setOrdersStatus] = useState<string>(
+    dataCart.length > 0 ? dataCart[0].status : ""
+  );
+  console.log(dataCart);
+
+  useEffect(() => {
+    if (socket.connected) {
+      onConnect();
+    }
+
+    function onConnect() {
+      console.log(`${socket.id} connected`);
+    }
+
+    function onDisconnect() {
+      console.log(`${socket.id} disconnected`);
+    }
+
+    socket.on("update-order", (data: any) => {
+      setOrdersStatus(data.status);
+    });
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+    };
+  }, []);
   return (
     <div className="p-6  rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-6">Your Order</h2>
@@ -19,7 +49,7 @@ export default function OrdersCart() {
           {dataCart?.map((dish) => (
             <div
               key={dish.id}
-              className="flex gap-4 p-4 rounded-lg transition-all duration-200"
+              className="flex gap-4 max-md:flex-col p-4 rounded-lg transition-all duration-200"
             >
               <div className="flex-shrink-0">
                 <Image
@@ -31,18 +61,20 @@ export default function OrdersCart() {
                   className="object-cover w-[80px] h-[80px] rounded-lg"
                 />
               </div>
-              <div className="flex-1 space-y-2">
-                <h3 className="text-md font-semibold">
-                  {dish.dishSnapshot.name}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {formatCurrency(dish.dishSnapshot.price)} x {dish.quantity}
-                </p>
-                <p className="text-md font-bold">
-                  {formatCurrency(dish.dishSnapshot.price * dish.quantity)}
-                </p>
-                <div className="flex-shrink-0 ml-auto flex justify-center items-center">
-                  {getVietnameseOrderStatus(dish.status)}
+              <div className="flex-1 flex max-md:flex-col gap-2">
+                <div className="flex-1 space-y-2">
+                  <h3 className="text-md font-semibold">
+                    {dish.dishSnapshot.name}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {formatCurrency(dish.dishSnapshot.price)} x {dish.quantity}
+                  </p>
+                  <p className="text-md font-bold">
+                    {formatCurrency(dish.dishSnapshot.price * dish.quantity)}
+                  </p>
+                </div>
+                <div className="flex-shrink-0 ml-auto max-sm:ml-0 font-bold rounded-xl flex justify-center items-center border border-black p-2">
+                  {getVietnameseOrderStatus(ordersStatus as unknown as any)}
                 </div>
               </div>
             </div>

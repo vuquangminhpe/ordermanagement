@@ -159,6 +159,6 @@ export const getVietnameseOrderStatus = (
     case OrderStatus.Paid:
       return "Đã thanh toán";
     default:
-      return "Từ chốichối";
+      return "Từ chối";
   }
 };
