@@ -6,13 +6,9 @@ import { useEffect, useState } from "react";
 import socket from "@/lib/socket";
 
 export default function OrdersCart() {
-  const { data: dataCarts } = useGuestOrderListQuery();
+  const { data: dataCarts, refetch } = useGuestOrderListQuery();
 
   const dataCart = dataCarts?.payload?.data ?? [];
-  const [ordersStatus, setOrdersStatus] = useState<string>(
-    dataCart.length > 0 ? dataCart[0].status : ""
-  );
-  console.log(dataCart);
 
   useEffect(() => {
     if (socket.connected) {
@@ -26,9 +22,13 @@ export default function OrdersCart() {
     function onDisconnect() {
       console.log(`${socket.id} disconnected`);
     }
-
+    function onOrderUpdate(data: any) {
+      if (data) {
+        refetch();
+      }
+    }
     socket.on("update-order", (data: any) => {
-      setOrdersStatus(data.status);
+      onOrderUpdate(data);
     });
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -74,7 +74,7 @@ export default function OrdersCart() {
                   </p>
                 </div>
                 <div className="flex-shrink-0 ml-auto max-sm:ml-0 font-bold rounded-xl flex justify-center items-center border border-black p-2">
-                  {getVietnameseOrderStatus(ordersStatus as unknown as any)}
+                  {getVietnameseOrderStatus(dish.status)}
                 </div>
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function OrdersCart() {
             <span className="text-lg font-bold ">
               {formatCurrency(
                 dataCart.reduce(
-                  (total, dish) =>
+                  (total: any, dish: any) =>
                     total + dish.dishSnapshot.price * dish.quantity,
                   0
                 )
