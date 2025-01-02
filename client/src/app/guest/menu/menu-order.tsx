@@ -9,10 +9,8 @@ import { GuestCreateOrdersBodyType } from "@/schemaValidations/guest.schema";
 import { useGuestOrderMutation } from "@/queries/useGuest";
 import { useRouter } from "next/navigation";
 import { DishStatus } from "@/constants/type";
-interface MenuOrderProps {
-  refetch: () => void;
-}
-export default function MenuOrder({ refetch }: MenuOrderProps) {
+
+export default function MenuOrder() {
   const { data: dataAllDishes } = useGetAllDishes();
   const route = useRouter();
   const dataAllDish = dataAllDishes?.payload?.data ?? [];
@@ -44,7 +42,6 @@ export default function MenuOrder({ refetch }: MenuOrderProps) {
     try {
       await orderGuestMutation.mutateAsync(orders, {
         onSuccess: (data) => {
-          refetch();
           route.push("/guest/orders");
           setOrders([]);
         },

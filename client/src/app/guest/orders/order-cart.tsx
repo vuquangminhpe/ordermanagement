@@ -11,9 +11,7 @@ export default function OrdersCart() {
   return (
     <div className="p-6  rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-6">Your Order</h2>
-      <div className="hidden">
-        <MenuOrder refetch={refetch} />
-      </div>
+
       {dataCart.length === 0 ? (
         <p className="text-gray-500 text-center">Your cart is empty.</p>
       ) : (
