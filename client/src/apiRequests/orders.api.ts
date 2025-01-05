@@ -1,5 +1,6 @@
 import http from "@/lib/http";
 import {
+  GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
   UpdateOrderBodyType,
@@ -18,7 +19,7 @@ const orderApiRequest = {
   updateOrders: (orderId: number, body: UpdateOrderBodyType) =>
     http.put<UpdateOrderResType>(`/orders/${orderId}`, body),
   getOrderDetail: (orderId: number) =>
-    http.get<GetOrdersResType>(`/orders/${orderId}`),
+    http.get<GetOrderDetailResType>(`/orders/${orderId}`),
   deleteOrders: (orderId: number) =>
     http.delete<GetOrdersResType>(`/orders/${orderId}`),
 };
