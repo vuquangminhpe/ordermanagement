@@ -210,18 +210,27 @@ export default function OrderTable() {
         refetch();
       }
     }
+    function onPayment(data: PayGuestOrdersResType["data"]) {
+      if (data) {
+        toast({
+          description: `Đã thanh toán cho ${data.length} đơn ở bàn ${data[0].tableNumber}`,
+        });
+        refetch();
+      }
+    }
     socket.on("update-order", (data: any) => {
       onOrderUpdate(data);
     });
     socket.on("new-order", newOrders);
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-
+    socket.on("payment", onPayment);
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("update-order", onOrderUpdate);
       socket.off("new-order", newOrders);
+      socket.off("payment", onPayment);
     };
   }, [orderListQueryRefetch, fromDate, toDate]);
 

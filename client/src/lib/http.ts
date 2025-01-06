@@ -153,6 +153,8 @@ const request = async <Response>(
         redirect(`/logout?accessToken=${accessToken}`);
       }
     } else {
+      console.log(data);
+
       throw new HttpError(data);
     }
   }

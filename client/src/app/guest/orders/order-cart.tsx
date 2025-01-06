@@ -5,6 +5,8 @@ import { useGuestOrderListQuery } from "@/queries/useGuest";
 import { useEffect, useState } from "react";
 import socket from "@/lib/socket";
 import { OrderStatus } from "@/constants/type";
+import { PayGuestOrdersResType } from "@/schemaValidations/order.schema";
+import { toast } from "@/components/ui/use-toast";
 
 export default function OrdersCart() {
   const { data: dataCarts, refetch } = useGuestOrderListQuery();
@@ -28,17 +30,26 @@ export default function OrdersCart() {
         refetch();
       }
     }
-    socket.on("update-order", (data: any) => {
-      onOrderUpdate(data);
-    });
+    function onPayment(data: PayGuestOrdersResType["data"]) {
+      const { guest } = data[0];
+      if (guest) {
+        toast({
+          description: `Payment for ${guest.name} successfully`,
+        });
+        refetch();
+      }
+    }
+    socket.on("update-order", onOrderUpdate);
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
-
+    socket.on("payment", onPayment);
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
+      socket.off("update-order", onOrderUpdate);
+      socket.off("payment", onPayment);
     };
-  }, []);
+  }, [refetch]);
   return (
     <div className="p-6  rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-6">Your Order</h2>
