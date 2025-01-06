@@ -4,6 +4,7 @@ import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestOrderListQuery } from "@/queries/useGuest";
 import { useEffect, useState } from "react";
 import socket from "@/lib/socket";
+import { OrderStatus } from "@/constants/type";
 
 export default function OrdersCart() {
   const { data: dataCarts, refetch } = useGuestOrderListQuery();
@@ -87,11 +88,13 @@ export default function OrdersCart() {
             <span className="text-lg font-bold ">Total</span>
             <span className="text-lg font-bold ">
               {formatCurrency(
-                dataCart.reduce(
-                  (total: any, dish: any) =>
-                    total + dish.dishSnapshot.price * dish.quantity,
-                  0
-                )
+                dataCart
+                  ?.filter((item) => item.status !== OrderStatus.Rejected)
+                  .reduce(
+                    (total: any, dish: any) =>
+                      total + dish.dishSnapshot.price * dish.quantity,
+                    0
+                  )
               )}
             </span>
           </div>
