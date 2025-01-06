@@ -1,5 +1,7 @@
 import http from "@/lib/http";
+import { CreateGuestResType } from "@/schemaValidations/account.schema";
 import {
+  CreateOrdersBodyType,
   GetOrderDetailResType,
   GetOrdersQueryParamsType,
   GetOrdersResType,
@@ -10,6 +12,8 @@ import {
 } from "@/schemaValidations/order.schema";
 import queryString from "query-string";
 const orderApiRequest = {
+  createOrders: (body: CreateOrdersBodyType) =>
+    http.post<CreateGuestResType>("/orders", body),
   getOrderList: (queryParams: GetOrdersQueryParamsType) =>
     http.get<GetOrdersResType>(
       "/orders?" +
