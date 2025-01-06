@@ -80,6 +80,7 @@ const start = async () => {
     fastify.register(guestRoutes, {
       prefix: '/guest'
     })
+
     await initOwnerAccount()
     await fastify.listen({
       port: envConfig.PORT
