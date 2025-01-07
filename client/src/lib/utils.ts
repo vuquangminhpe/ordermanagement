@@ -51,6 +51,7 @@ export const removeTokensFromLocalStorage = () => {
 export const checkAndRefreshToken = async (param?: {
   onError?: () => void;
   onSuccess?: () => void;
+  force?: boolean;
 }) => {
   const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
@@ -72,8 +73,9 @@ export const checkAndRefreshToken = async (param?: {
   // time còn lại tính theo CT:decodedAccessToken.exp - now
   // thời gian hết hạn của access token: decodedAccessToken.exp - decodedAccessToken.iat
   if (
+    param?.force ||
     decodedAccessToken.exp - now <
-    (decodedAccessToken.exp - decodedAccessToken.iat) / 3
+      (decodedAccessToken.exp - decodedAccessToken.iat) / 3
   ) {
     // Goị api refresh token
     try {
@@ -185,7 +187,14 @@ export const formatDateTimeToLocaleString = (date: string | Date) => {
 export const formatDateTimeToTimeString = (date: string | Date) => {
   return format(date instanceof Date ? date : new Date(date), "HH:mm:ss");
 };
-
+export const getRoleFromClient = () => {
+  const accessToken = getAccessTokenFromLocalStorage();
+  if (!accessToken) {
+    return null;
+  }
+  const decodedAccessToken = decodeToken(accessToken);
+  return decodedAccessToken.role;
+};
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,
   [OrderStatus.Processing]: CookingPot,

@@ -153,8 +153,6 @@ const request = async <Response>(
         redirect(`/logout?accessToken=${accessToken}`);
       }
     } else {
-      console.log(data);
-
       throw new HttpError(data);
     }
   }
@@ -168,7 +166,6 @@ const request = async <Response>(
       normalizeUrl.includes("guest/auth/login")
     ) {
       const { accessToken, refreshToken } = (payload as LoginResType).data;
-      console.log("tokens:", accessToken, refreshToken);
       setAccessTokenToLocalStorage(accessToken);
       setRefreshTokenToLocalStorage(refreshToken);
     } else if (

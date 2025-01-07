@@ -1,37 +1,51 @@
-import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
+import { Role } from "@/constants/type";
+import {
+  Home,
+  LineChart,
+  ShoppingCart,
+  Users2,
+  Salad,
+  Table,
+} from "lucide-react";
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     Icon: Home,
-    href: '/manage/dashboard'
+    href: "/manage/dashboard",
+    role: [Role.Owner, Role.Employee],
   },
   {
-    title: 'Đơn hàng',
+    title: "Đơn hàng",
     Icon: ShoppingCart,
-    href: '/manage/orders'
+    href: "/manage/orders",
+    role: [Role.Owner, Role.Employee],
   },
   {
-    title: 'Bàn ăn',
+    title: "Bàn ăn",
     Icon: Table,
-    href: '/manage/tables'
+    href: "/manage/tables",
+    role: [Role.Owner, Role.Employee],
   },
   {
-    title: 'Món ăn',
+    title: "Món ăn",
     Icon: Salad,
-    href: '/manage/dishes'
+    href: "/manage/dishes",
+    role: [Role.Owner, Role.Employee],
   },
 
   {
-    title: 'Phân tích',
+    title: "Phân tích",
     Icon: LineChart,
-    href: '/manage/analytics'
+    href: "/manage/analytics",
+    role: [Role.Owner],
   },
   {
-    title: 'Nhân viên',
+    title: "Nhân viên",
     Icon: Users2,
-    href: '/manage/accounts'
-  }
-]
+    href: "/manage/accounts",
+    role: [Role.Owner],
+  },
+];
 
-export default menuItems
+export default menuItems;

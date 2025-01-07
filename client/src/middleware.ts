@@ -5,6 +5,7 @@ import { Role } from "./constants/type";
 
 const unAuthPaths = ["/login"];
 const managePaths = ["/manage"];
+const onlyOwnerPaths = ["/manage/accounts"];
 const privatePaths = [...managePaths, ...unAuthPaths];
 const guestPaths = ["/guest"];
 export function middleware(req: NextRequest) {
@@ -50,7 +51,14 @@ export function middleware(req: NextRequest) {
     const isNotGuestGotoGuestPath =
       role !== Role.Guest &&
       guestPaths.some((path) => pathname.startsWith(path));
-    if (isGuestGotoManagePath || isNotGuestGotoGuestPath) {
+    const isNotOwnerGotoOwnerPath =
+      role !== Role.Owner &&
+      onlyOwnerPaths.some((path) => pathname.startsWith(path));
+    if (
+      isGuestGotoManagePath ||
+      isNotGuestGotoGuestPath ||
+      isNotOwnerGotoOwnerPath
+    ) {
       const url = new URL("/", req.url);
       return NextResponse.redirect(url);
     }
