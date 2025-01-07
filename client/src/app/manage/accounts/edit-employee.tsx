@@ -16,16 +16,26 @@ import {
 } from "@/schemaValidations/account.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Upload } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { useUploadMediaMutation } from "@/queries/useMedia";
-import { useUpdateAccountMutation } from "@/queries/useAccount";
+import {
+  useGetDetailsAccount,
+  useUpdateAccountMutation,
+} from "@/queries/useAccount";
 import { toast } from "@/components/ui/use-toast";
 import { handleErrorApi } from "@/lib/utils";
-
+import { Role, RoleValues } from "@/constants/type";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 export default function EditEmployee({
   id,
   setId,
@@ -39,6 +49,7 @@ export default function EditEmployee({
 }) {
   const [file, setFile] = useState<File | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
+  const { data } = useGetDetailsAccount({ id: id as number });
   const uploadMediaMutation = useUploadMediaMutation();
   const updateEmployeeMutation = useUpdateAccountMutation();
   const form = useForm<UpdateEmployeeAccountBodyType>({
@@ -50,8 +61,10 @@ export default function EditEmployee({
       password: undefined,
       confirmPassword: undefined,
       changePassword: false,
+      role: data?.payload.data.role ?? Role.Employee,
     },
   });
+
   const avatar = form.watch("avatar");
   const name = form.watch("name");
   const changePassword = form.watch("changePassword");
@@ -65,10 +78,27 @@ export default function EditEmployee({
     form.reset({});
     setFile(null);
   };
+
+  useEffect(() => {
+    if (data) {
+      const { name, avatar, email, role } = data.payload.data;
+      form.reset({
+        name,
+        avatar: avatar ?? undefined,
+        email,
+        changePassword: form.getValues("changePassword"),
+        password: form.getValues("password"),
+        confirmPassword: form.getValues("confirmPassword"),
+        role,
+      });
+    }
+  }, [form, data]);
+
   const onSubmit = async (values: UpdateEmployeeAccountBodyType) => {
     if (updateEmployeeMutation.isPending) return;
     try {
       let body = values;
+
       if (file) {
         const formData = new FormData();
         formData.append("file", file);
@@ -81,10 +111,20 @@ export default function EditEmployee({
           avatar: imageUrl,
         };
       }
-      const result = await updateEmployeeMutation.mutateAsync({
-        id: id as number,
-        ...body,
-      });
+      console.log(body);
+      const result = await updateEmployeeMutation.mutateAsync(
+        {
+          id: id as number,
+          ...body,
+        },
+        {
+          onSuccess: (data) => {
+            console.log("update thanh cong", data);
+
+            refetch();
+          },
+        }
+      );
       onSubmitSuccess && onSubmitSuccess();
       toast({
         description: `${result.payload.data.name} đã được cập nhật`,
@@ -186,6 +226,37 @@ export default function EditEmployee({
                       <Label htmlFor="email">Email</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="email" className="w-full" {...field} />
+                        <FormMessage />
+                      </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="grid grid-cols-4 items-center justify-items-start gap-4">
+                      <Label htmlFor="role">Vai trò</Label>
+                      <div className="col-span-3 w-full space-y-2">
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Chọn vai trò" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {RoleValues.filter((item) => item !== "Guest").map(
+                              (role) => (
+                                <SelectItem key={role} value={role}>
+                                  {role}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </div>
                     </div>

@@ -31,7 +31,7 @@ export const useAccountList = () => {
   });
 };
 
-export const useGetAccount = ({ id }: { id: number }) => {
+export const useGetDetailsAccount = ({ id }: { id: number }) => {
   return useQuery({
     queryKey: ["account-get-account", id],
     queryFn: () => accountApiRequest.getEmployee(id),

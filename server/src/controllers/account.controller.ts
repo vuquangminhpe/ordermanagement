@@ -78,15 +78,10 @@ export const getEmployeeAccount = async (accountId: number) => {
   return account
 }
 
-export const getAccountList = async (accountId: number) => {
+export const getAccountList = async () => {
   const account = await prisma.account.findMany({
     orderBy: {
       createdAt: 'desc'
-    },
-    where: {
-      id: {
-        not: accountId
-      }
     }
   })
   return account
@@ -104,7 +99,8 @@ export const updateEmployeeAccount = async (accountId: number, body: UpdateEmplo
           name: body.name,
           email: body.email,
           avatar: body.avatar,
-          password: hashedPassword
+          password: hashedPassword,
+          role: body.role
         }
       })
       return account
@@ -116,7 +112,8 @@ export const updateEmployeeAccount = async (accountId: number, body: UpdateEmplo
         data: {
           name: body.name,
           email: body.email,
-          avatar: body.avatar
+          avatar: body.avatar,
+          role: body.role
         }
       })
       return account
