@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react";
 export default function LoginPage() {
   const { mutateAsync } = useLogoutMutation();
   const router = useRouter();
-  const { setRole } = useAppContext();
+  const { setRole, disconnectSocket } = useAppContext();
   const searchParams = useSearchParams();
   const refreshTokenFromUrl = searchParams.get("refreshToken");
   const accessTokenFromUrl = searchParams.get("accessToken");
@@ -31,6 +31,7 @@ export default function LoginPage() {
           ref.current = null;
         }, 1000);
         setRole(undefined);
+        disconnectSocket();
         router.push("/login");
       });
     } else {
@@ -43,6 +44,7 @@ export default function LoginPage() {
     getRefreshTokenFromLocalStorage(),
     getAccessTokenFromLocalStorage(),
     setRole,
+    disconnectSocket,
   ]);
   return <div className="ml-5">Logout out ...</div>;
 }

@@ -3,27 +3,28 @@ import Image from "next/image";
 import { formatCurrency, getVietnameseOrderStatus } from "@/lib/utils";
 import { useGuestOrderListQuery } from "@/queries/useGuest";
 import { useEffect, useState } from "react";
-import socket from "@/lib/socket";
 import { OrderStatus } from "@/constants/type";
 import { PayGuestOrdersResType } from "@/schemaValidations/order.schema";
 import { toast } from "@/components/ui/use-toast";
+import { useAppContext } from "@/components/app-provider";
 
 export default function OrdersCart() {
+  const { socket } = useAppContext();
   const { data: dataCarts, refetch } = useGuestOrderListQuery();
 
   const dataCart = dataCarts?.payload?.data ?? [];
 
   useEffect(() => {
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect();
     }
 
     function onConnect() {
-      console.log(`${socket.id} connected`);
+      console.log(`${socket?.id} connected`);
     }
 
     function onDisconnect() {
-      console.log(`${socket.id} disconnected`);
+      console.log(`${socket?.id} disconnected`);
     }
     function onOrderUpdate(data: any) {
       if (data) {
@@ -39,17 +40,17 @@ export default function OrdersCart() {
         refetch();
       }
     }
-    socket.on("update-order", onOrderUpdate);
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("payment", onPayment);
+    socket?.on("update-order", onOrderUpdate);
+    socket?.on("connect", onConnect);
+    socket?.on("disconnect", onDisconnect);
+    socket?.on("payment", onPayment);
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("update-order", onOrderUpdate);
-      socket.off("payment", onPayment);
+      socket?.off("connect", onConnect);
+      socket?.off("disconnect", onDisconnect);
+      socket?.off("update-order", onOrderUpdate);
+      socket?.off("payment", onPayment);
     };
-  }, [refetch]);
+  }, [refetch, socket]);
   return (
     <div className="p-6  rounded-lg shadow-lg">
       <h2 className="text-xl font-bold mb-6">Your Order</h2>

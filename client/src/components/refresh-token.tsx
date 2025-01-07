@@ -3,11 +3,12 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { checkAndRefreshToken } from "@/lib/utils";
-import socket from "@/lib/socket";
+import { useAppContext } from "./app-provider";
 
 const UNAUTHENTICATED_PATHS = ["/login", "/logout", "/refresh-token"];
 
 export default function RefreshToken() {
+  const { socket, disconnectSocket } = useAppContext();
   const pathname = usePathname();
   const router = useRouter();
   useEffect(() => {
@@ -21,7 +22,7 @@ export default function RefreshToken() {
       checkAndRefreshToken({
         onError: () => {
           clearInterval(intervalId);
-
+          disconnectSocket;
           router.push("/login");
         },
         force,
@@ -29,31 +30,31 @@ export default function RefreshToken() {
 
     const TIMEOUT = 1000 * 60;
     intervalId = setInterval(() => onRefreshToken, TIMEOUT);
-    if (socket.connected) {
+    if (socket?.connected) {
       onConnect();
     }
 
     function onConnect() {
-      console.log(`${socket.id} connected`);
+      console.log(`${socket?.id} connected`);
     }
 
     function onDisconnect() {
-      console.log(`${socket.id} disconnected`);
+      console.log(`${socket?.id} disconnected`);
     }
     function onRefreshTokenSocket() {
       onRefreshToken(true);
     }
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-    socket.on("refresh-token", onRefreshTokenSocket);
+    socket?.on("connect", onConnect);
+    socket?.on("disconnect", onDisconnect);
+    socket?.on("refresh-token", onRefreshTokenSocket);
 
     return () => {
       clearInterval(intervalId);
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-      socket.off("refresh-token", onRefreshTokenSocket);
+      socket?.off("connect", onConnect);
+      socket?.off("disconnect", onDisconnect);
+      socket?.off("refresh-token", onRefreshTokenSocket);
     };
-  }, [pathname, router]);
+  }, [pathname, router, socket, disconnectSocket]);
 
   return null;
 }

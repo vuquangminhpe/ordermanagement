@@ -11,6 +11,7 @@ import jwt from "jsonwebtoken";
 import envConfig from "@/config";
 import { TokenPayload } from "@/types/jwt.types";
 import guestApiRequest from "@/apiRequests/guest.api";
+import { io } from "socket.io-client";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -194,6 +195,13 @@ export const getRoleFromClient = () => {
   }
   const decodedAccessToken = decodeToken(accessToken);
   return decodedAccessToken.role;
+};
+export const generateSocketInstance = (accessToken: string) => {
+  return io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
+    auth: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 };
 export const OrderStatusIcon = {
   [OrderStatus.Pending]: Loader,

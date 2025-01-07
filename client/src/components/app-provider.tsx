@@ -12,9 +12,12 @@ import {
 import { RoleType } from "@/types/jwt.types";
 import {
   decodeToken,
+  generateSocketInstance,
   getAccessTokenFromLocalStorage,
   removeTokensFromLocalStorage,
 } from "@/lib/utils";
+import type { Socket } from "socket.io-client";
+import { disconnect } from "process";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,6 +28,9 @@ const queryClient = new QueryClient({
 const AppContext = createContext({
   role: undefined as RoleType | undefined,
   setRole: (role?: RoleType | undefined) => {},
+  socket: undefined as Socket | undefined,
+  setSocket: (socket?: Socket | undefined) => {},
+  disconnectSocket: () => {},
 });
 export const useAppContext = () => {
   return useContext(AppContext);
@@ -34,14 +40,20 @@ export default function AppProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const [socket, setSocket] = useState<Socket | undefined>();
   const [role, setRoleState] = useState<RoleType | undefined>();
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage();
     if (accessToken) {
       const role = decodeToken(accessToken).role;
       setRoleState(role);
+      setSocket(generateSocketInstance(accessToken));
     }
   }, []);
+  const disconnectSocket = useCallback(() => {
+    socket?.disconnect();
+    setSocket(undefined);
+  }, [socket]);
   const setRole = useCallback(
     (roles?: RoleType | undefined) => {
       setRoleState(roles);
@@ -52,7 +64,9 @@ export default function AppProvider({
     [role]
   );
   return (
-    <AppContext.Provider value={{ role, setRole }}>
+    <AppContext.Provider
+      value={{ role, setRole, socket, setSocket, disconnectSocket }}
+    >
       <QueryClientProvider client={queryClient}>
         {children}
         <RefreshToken />

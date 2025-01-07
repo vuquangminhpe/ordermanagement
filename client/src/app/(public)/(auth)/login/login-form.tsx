@@ -14,14 +14,16 @@ import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { LoginBody, LoginBodyType } from "@/schemaValidations/auth.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/queries/useAuth";
-import { handleErrorApi } from "@/lib/utils";
+import { generateSocketInstance, handleErrorApi } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { toast as toastSonner } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppContext } from "@/components/app-provider";
+import { io } from "socket.io-client";
+import envConfig from "@/config";
 
 export default function LoginForm() {
-  const { setRole } = useAppContext();
+  const { setRole, setSocket } = useAppContext();
   const router = useRouter();
   const loginMutation = useLoginMutation();
   const searchParams = useSearchParams();
@@ -49,6 +51,7 @@ export default function LoginForm() {
 
       setRole(result.payload.data.account.role);
       router.push("/manage/dashboard");
+      setSocket(generateSocketInstance(result.payload.data.accessToken));
     } catch (error: any) {
       handleErrorApi({
         error,
