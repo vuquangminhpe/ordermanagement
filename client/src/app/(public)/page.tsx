@@ -2,6 +2,7 @@
 import { formatCurrency } from "@/lib/utils";
 import { useGetAllDishes } from "@/queries/useDishes";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   const { data: dataAllDishes } = useGetAllDishes();
@@ -32,7 +33,11 @@ export default function Home() {
         <h2 className="text-center text-2xl font-bold">Đa dạng các món ăn</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
           {allDishes?.map((item, index) => (
-            <div className="flex gap-4 w" key={index}>
+            <Link
+              href={`dishes/${item.id}`}
+              className="flex gap-4 w"
+              key={index}
+            >
               <div className="flex-shrink-0">
                 <img
                   src={item.image}
@@ -44,7 +49,7 @@ export default function Home() {
                 <p className="">{item.description}</p>
                 <p className="font-semibold">{formatCurrency(item.price)}</p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
