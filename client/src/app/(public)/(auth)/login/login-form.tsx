@@ -18,12 +18,12 @@ import { generateSocketInstance, handleErrorApi } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { toast as toastSonner } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { io } from "socket.io-client";
 import envConfig from "@/config";
 
 export default function LoginForm() {
-  const { setRole, setSocket } = useAppContext();
+  const { setRole, setSocket } = useAppStore();
   const router = useRouter();
   const loginMutation = useLoginMutation();
   const searchParams = useSearchParams();

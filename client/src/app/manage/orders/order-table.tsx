@@ -58,7 +58,7 @@ import { OrderStatusValues } from "@/constants/type";
 import { useGetAllTables } from "@/queries/useTable";
 import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
 import { toast } from "@/components/ui/use-toast";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -87,7 +87,7 @@ const PAGE_SIZE = 10;
 const initFromDate = startOfDay(new Date());
 const initToDate = endOfDay(new Date());
 export default function OrderTable() {
-  const { socket } = useAppContext();
+  const { socket } = useAppStore();
   const searchParam = useSearchParams();
   const [openStatusFilter, setOpenStatusFilter] = useState(false);
   const [fromDate, setFromDate] = useState(initFromDate);

@@ -17,7 +17,7 @@ import {
   removeTokensFromLocalStorage,
 } from "@/lib/utils";
 import type { Socket } from "socket.io-client";
-import { disconnect } from "process";
+import { create } from "zustand";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,16 +25,39 @@ const queryClient = new QueryClient({
     },
   },
 });
-const AppContext = createContext({
-  role: undefined as RoleType | undefined,
-  setRole: (role?: RoleType | undefined) => {},
-  socket: undefined as Socket | undefined,
-  setSocket: (socket?: Socket | undefined) => {},
-  disconnectSocket: () => {},
-});
-export const useAppContext = () => {
-  return useContext(AppContext);
+type AppContextType = {
+  role: RoleType | undefined;
+  setRole: (role?: RoleType | undefined) => void;
+  socket: Socket | undefined;
+  setSocket: (socket?: Socket | undefined) => void;
+  disconnectSocket: () => void;
 };
+// const AppContext = createContext({
+//   role: undefined as RoleType | undefined,
+//   setRole: (role?: RoleType | undefined) => {},
+//   socket: undefined as Socket | undefined,
+//   setSocket: (socket?: Socket | undefined) => {},
+//   disconnectSocket: () => {},
+// });
+export const useAppStore = create<AppContextType>((set) => ({
+  role: undefined as RoleType | undefined,
+  setRole: (role?: RoleType | undefined) => {
+    set({ role });
+    if (!role) {
+      removeTokensFromLocalStorage();
+    }
+  },
+  socket: undefined as Socket | undefined,
+  setSocket: (socket?: Socket | undefined) => set({ socket }),
+  disconnectSocket: () =>
+    set((state) => {
+      state.socket?.disconnect();
+      return { socket: undefined };
+    }),
+}));
+// export const useAppStore = () => {
+//   return useContext(AppContext);
+// };
 export default function AppProvider({
   children,
 }: {
@@ -50,28 +73,28 @@ export default function AppProvider({
       setSocket(generateSocketInstance(accessToken));
     }
   }, []);
-  const disconnectSocket = useCallback(() => {
-    socket?.disconnect();
-    setSocket(undefined);
-  }, [socket]);
-  const setRole = useCallback(
-    (roles?: RoleType | undefined) => {
-      setRoleState(roles);
-      if (!roles) {
-        removeTokensFromLocalStorage();
-      }
-    },
-    [role]
-  );
+  // const disconnectSocket = useCallback(() => {
+  //   socket?.disconnect();
+  //   setSocket(undefined);
+  // }, [socket]);
+  // const setRole = useCallback(
+  //   (roles?: RoleType | undefined) => {
+  //     setRoleState(roles);
+  //     if (!roles) {
+  //       removeTokensFromLocalStorage();
+  //     }
+  //   },
+  //   [role]
+  // );
   return (
-    <AppContext.Provider
-      value={{ role, setRole, socket, setSocket, disconnectSocket }}
-    >
-      <QueryClientProvider client={queryClient}>
-        {children}
-        <RefreshToken />
-        <ReactQueryDevtools initialIsOpen={false} />
-      </QueryClientProvider>
-    </AppContext.Provider>
+    // <AppContext.Provider
+    //   value={{ role, setRole, socket, setSocket, disconnectSocket }}
+    // >
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <RefreshToken />
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+    // </AppContext.Provider>
   );
 }

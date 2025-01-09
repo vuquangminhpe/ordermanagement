@@ -6,10 +6,10 @@ import { useEffect, useState } from "react";
 import { OrderStatus } from "@/constants/type";
 import { PayGuestOrdersResType } from "@/schemaValidations/order.schema";
 import { toast } from "@/components/ui/use-toast";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 
 export default function OrdersCart() {
-  const { socket } = useAppContext();
+  const { socket } = useAppStore();
   const { data: dataCarts, refetch } = useGuestOrderListQuery();
 
   const dataCart = dataCarts?.payload?.data ?? [];

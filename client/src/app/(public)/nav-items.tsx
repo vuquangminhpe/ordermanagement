@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { RoleType } from "@/types/jwt.types";
-import { useAppContext } from "@/components/app-provider";
+import { useAppStore } from "@/components/app-provider";
 import { cn, handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { useRouter } from "next/navigation";
@@ -40,7 +40,9 @@ const menuItems: {
 ];
 
 export default function NavItems({ className }: { className?: string }) {
-  const { role, setRole, disconnectSocket } = useAppContext();
+  const { role, setRole, disconnectSocket } = useAppStore();
+  console.log(role);
+
   const route = useRouter();
   const logoutMutation = useLogoutMutation();
   const logout = async () => {
